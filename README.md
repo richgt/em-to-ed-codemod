@@ -1,4 +1,4 @@
-# em-to-ed-codemod
+# em-to-ed-codemod [![Build Status](https://travis-ci.org/patocallaghan/em-to-ed-codemod.svg?branch=master)](https://travis-ci.org/patocallaghan/em-to-ed-codemod)
 
 
 A collection of codemod's for em-to-ed-codemod.
