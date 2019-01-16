@@ -14,4 +14,4 @@ module.exports = function transformer(file, api) {
         .join('');
     })
     .toSource();
-}
+};
