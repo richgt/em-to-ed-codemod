@@ -91,6 +91,38 @@ function migrateEmberModelHasMany(j, source) {
     .toSource(FORMATTING_OPTIONS);
 }
 
+function migrateEmberModelBelongsTo(j, source) {
+  return j(source)
+    .find(j.CallExpression, {
+      callee: {
+        name: 'belongsTo',
+      },
+    })
+    .forEach(path => {
+      let isEmbedded;
+      let args = path.value.arguments;
+
+      if (args.length > 1) {
+        isEmbedded = getOptionValue('embedded', args[1]);
+      }
+
+      path.replace(
+        j.callExpression(j.identifier('DS.attr'), [
+          j.literal('ember-model-belongs-to'),
+          j.objectExpression([
+            j.property('init', j.identifier('modelClass'), args[0]),
+            j.property(
+              'init',
+              j.identifier('embedded'),
+              j.identifier(isEmbedded ? 'true' : 'false'),
+            ),
+          ]),
+        ]),
+      );
+    })
+    .toSource(FORMATTING_OPTIONS);
+}
+
 function getOptionValue(name, options) {
   let option = options.properties.find(p => p.key.name === name);
   if (!option) {
@@ -109,5 +141,6 @@ module.exports = function transformer(file, api) {
   source = removeEmberModelImport(j, source);
   source = migrateEmberModelAttr(j, source);
   source = migrateEmberModelHasMany(j, source);
+  source = migrateEmberModelBelongsTo(j, source);
   return source;
 };
