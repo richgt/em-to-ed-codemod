@@ -67,26 +67,7 @@ function migrateEmberModelHasMany(j, source) {
       },
     })
     .forEach(path => {
-      let isEmbedded;
-      let args = path.value.arguments;
-
-      if (args.length > 1) {
-        isEmbedded = getOptionValue('embedded', args[1]);
-      }
-
-      path.replace(
-        j.callExpression(j.identifier('DS.attr'), [
-          j.literal('ember-model-has-many'),
-          j.objectExpression([
-            j.property('init', j.identifier('modelClass'), args[0]),
-            j.property(
-              'init',
-              j.identifier('embedded'),
-              j.identifier(isEmbedded ? 'true' : 'false'),
-            ),
-          ]),
-        ]),
-      );
+      path.replace(emberModelTransform(j, 'ember-model-has-many', path.value.arguments));
     })
     .toSource(FORMATTING_OPTIONS);
 }
@@ -99,28 +80,25 @@ function migrateEmberModelBelongsTo(j, source) {
       },
     })
     .forEach(path => {
-      let isEmbedded;
-      let args = path.value.arguments;
-
-      if (args.length > 1) {
-        isEmbedded = getOptionValue('embedded', args[1]);
-      }
-
-      path.replace(
-        j.callExpression(j.identifier('DS.attr'), [
-          j.literal('ember-model-belongs-to'),
-          j.objectExpression([
-            j.property('init', j.identifier('modelClass'), args[0]),
-            j.property(
-              'init',
-              j.identifier('embedded'),
-              j.identifier(isEmbedded ? 'true' : 'false'),
-            ),
-          ]),
-        ]),
-      );
+      path.replace(emberModelTransform(j, 'ember-model-belongs-to', path.value.arguments));
     })
     .toSource(FORMATTING_OPTIONS);
+}
+
+function emberModelTransform(j, transform, args) {
+  let isEmbedded;
+
+  if (args.length > 1) {
+    isEmbedded = getOptionValue('embedded', args[1]);
+  }
+
+  return j.callExpression(j.identifier('DS.attr'), [
+    j.literal(transform),
+    j.objectExpression([
+      j.property('init', j.identifier('modelClass'), args[0]),
+      j.property('init', j.identifier('embedded'), j.identifier(isEmbedded ? 'true' : 'false')),
+    ]),
+  ]);
 }
 
 function getOptionValue(name, options) {
