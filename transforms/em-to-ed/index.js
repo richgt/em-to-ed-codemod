@@ -76,7 +76,7 @@ function migrateEmberModelHasMany(j, source) {
 
       path.replace(
         j.callExpression(j.identifier('DS.attr'), [
-          j.literal('ember-model-array'),
+          j.literal('ember-model-has-many'),
           j.objectExpression([
             j.property('init', j.identifier('modelClass'), args[0]),
             j.property(
