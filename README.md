@@ -8,17 +8,13 @@ A collection of codemod's for em-to-ed-codemod.
 To run a specific codemod from this project, you would run the following:
 
 ```
-npx em-to-ed-codemod <TRANSFORM NAME> path/of/files/ or/some**/*glob.js
-
-# or
-
-yarn global add em-to-ed-codemod
-em-to-ed-codemod <TRANSFORM NAME> path/of/files/ or/some**/*glob.js
+npx github:patocallaghan/em-to-ed-codemod <TRANSFORM NAME> path/of/files/ or/some**/*glob.js
 ```
 
 ## Transforms
 
 <!--TRANSFORMS_START-->
+* [em-to-ed](transforms/em-to-ed/README.md)
 <!--TRANSFORMS_END-->
 
 ## Contributing
@@ -32,6 +28,8 @@ em-to-ed-codemod <TRANSFORM NAME> path/of/files/ or/some**/*glob.js
 ### Running tests
 
 * `yarn test`
+* `yarn test:watch` for live-reloading
+* For debugging, install [ndb](https://www.npmjs.com/package/ndb) and run `ndb yarn test:watch`
 
 ### Update Documentation
 
