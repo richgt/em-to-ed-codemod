@@ -74,14 +74,19 @@ function migrateEmberModelHasMany(j, source) {
         isEmbedded = getOptionValue('embedded', args[1]);
       }
 
-      if (isEmbedded) {
-        path.replace(
-          j.callExpression(j.identifier('DS.attr'), [
-            j.literal('ember-model-array'),
-            j.objectExpression([j.property('init', j.identifier('modelClass'), args[0])]),
+      path.replace(
+        j.callExpression(j.identifier('DS.attr'), [
+          j.literal('ember-model-array'),
+          j.objectExpression([
+            j.property('init', j.identifier('modelClass'), args[0]),
+            j.property(
+              'init',
+              j.identifier('embedded'),
+              j.identifier(isEmbedded ? 'true' : 'false'),
+            ),
           ]),
-        );
-      }
+        ]),
+      );
     })
     .toSource(FORMATTING_OPTIONS);
 }
