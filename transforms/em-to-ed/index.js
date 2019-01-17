@@ -19,6 +19,19 @@ function migrateIntercomModelImport(j, source) {
     .toSource({ quote: 'single' });
 }
 
+function removeEmberModelImport(j, source) {
+  return j(source)
+    .find(j.ImportDeclaration, {
+      source: {
+        value: 'ember-model',
+      },
+    })
+    .forEach(path => {
+      path.prune();
+    })
+    .toSource({ quote: 'single' });
+}
+
 function migrateIntercomModelExtend(j, source) {
   return j(source)
     .find(j.MemberExpression, {
@@ -31,6 +44,19 @@ function migrateIntercomModelExtend(j, source) {
     .toSource({ quote: 'single' });
 }
 
+function migrateEmberModelAttr(j, source) {
+  return j(source)
+    .find(j.CallExpression, {
+      callee: {
+        name: 'attr',
+      },
+    })
+    .forEach(path => {
+      path.replace(j.callExpression(j.identifier('DS.attr'), path.value.arguments));
+    })
+    .toSource({ quote: 'single' });
+}
+
 module.exports = function transformer(file, api) {
   const j = getParser(api);
   const options = getOptions();
@@ -38,5 +64,7 @@ module.exports = function transformer(file, api) {
   let source = file.source;
   source = migrateIntercomModelImport(j, file.source);
   source = migrateIntercomModelExtend(j, source);
+  source = removeEmberModelImport(j, source);
+  source = migrateEmberModelAttr(j, source);
   return source;
 };
