@@ -1,6 +1,8 @@
 const { getParser } = require('codemod-cli').jscodeshift;
 const { getOptions } = require('codemod-cli');
 
+const FORMATTING_OPTIONS = { quote: 'single', trailingComma: true };
+
 function migrateIntercomModelImport(j, source) {
   return j(source)
     .find(j.ImportDeclaration, {
@@ -16,7 +18,7 @@ function migrateIntercomModelImport(j, source) {
         ),
       );
     })
-    .toSource({ quote: 'single' });
+    .toSource(FORMATTING_OPTIONS);
 }
 
 function removeEmberModelImport(j, source) {
@@ -29,7 +31,7 @@ function removeEmberModelImport(j, source) {
     .forEach(path => {
       path.prune();
     })
-    .toSource({ quote: 'single' });
+    .toSource(FORMATTING_OPTIONS);
 }
 
 function migrateIntercomModelExtend(j, source) {
@@ -41,7 +43,7 @@ function migrateIntercomModelExtend(j, source) {
     .forEach(path => {
       path.replace(j.memberExpression(j.identifier('DS.Model'), j.identifier('extend')));
     })
-    .toSource({ quote: 'single' });
+    .toSource(FORMATTING_OPTIONS);
 }
 
 function migrateEmberModelAttr(j, source) {
@@ -54,7 +56,42 @@ function migrateEmberModelAttr(j, source) {
     .forEach(path => {
       path.replace(j.callExpression(j.identifier('DS.attr'), path.value.arguments));
     })
-    .toSource({ quote: 'single' });
+    .toSource(FORMATTING_OPTIONS);
+}
+
+function migrateEmberModelHasMany(j, source) {
+  return j(source)
+    .find(j.CallExpression, {
+      callee: {
+        name: 'hasMany',
+      },
+    })
+    .forEach(path => {
+      let isEmbedded;
+      let args = path.value.arguments;
+
+      if (args.length > 1) {
+        isEmbedded = getOptionValue('embedded', args[1]);
+      }
+
+      if (isEmbedded) {
+        path.replace(
+          j.callExpression(j.identifier('DS.attr'), [
+            j.literal('ember-model-array'),
+            j.objectExpression([j.property('init', j.identifier('modelClass'), args[0])]),
+          ]),
+        );
+      }
+    })
+    .toSource(FORMATTING_OPTIONS);
+}
+
+function getOptionValue(name, options) {
+  let option = options.properties.find(p => p.key.name === name);
+  if (!option) {
+    return;
+  }
+  return option.value.value;
 }
 
 module.exports = function transformer(file, api) {
@@ -66,5 +103,6 @@ module.exports = function transformer(file, api) {
   source = migrateIntercomModelExtend(j, source);
   source = removeEmberModelImport(j, source);
   source = migrateEmberModelAttr(j, source);
+  source = migrateEmberModelHasMany(j, source);
   return source;
 };
