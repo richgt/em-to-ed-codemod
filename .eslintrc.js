@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   extends: ['eslint:recommended', 'prettier'],
   plugins: ['prettier'],
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 2015,
     sourceType: 'module',

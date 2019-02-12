@@ -1,5 +1,4 @@
 const { getParser } = require('codemod-cli').jscodeshift;
-const { getOptions } = require('codemod-cli');
 const belongsToTransform = require('./util/belongs-to-transform');
 const hasManyTransform = require('./util/has-many-transform');
 const attrTransform = require('./util/attr-transform');
@@ -65,7 +64,6 @@ function removeJsonTypeImport(j, source) {
 
 module.exports = function transformer(file, api) {
   const j = getParser(api);
-  const options = getOptions();
 
   let source = file.source;
   source = migrateIntercomModelImport(j, file.source);
