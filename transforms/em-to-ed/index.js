@@ -2,6 +2,8 @@ const { getParser } = require('codemod-cli').jscodeshift;
 const { getOptions } = require('codemod-cli');
 const belongsToTransform = require('./util/belongs-to-transform');
 const hasManyTransform = require('./util/has-many-transform');
+const attrTransform = require('./util/attr-transform');
+const closestAncestorOfType = require('./util/closest-ancestor-of-type');
 const FORMATTING = require('./util/formatting');
 
 function migrateIntercomModelImport(j, source) {
@@ -47,41 +49,18 @@ function migrateIntercomModelExtend(j, source) {
     .toSource(FORMATTING);
 }
 
-function migrateEmberModelAttr(j, source) {
+function removeJsonTypeImport(j, source) {
   return j(source)
-    .find(j.CallExpression, {
-      callee: {
-        name: 'attr',
+    .find(j.ImportDefaultSpecifier, {
+      local: {
+        name: 'JsonType',
       },
     })
     .forEach(path => {
-      path.replace(j.callExpression(j.identifier('DS.attr'), path.value.arguments));
+      let declaration = closestAncestorOfType(path, /ImportDeclaration/);
+      declaration.prune();
     })
     .toSource(FORMATTING);
-}
-
-function emberModelTransform(j, transform, args) {
-  let isEmbedded;
-
-  if (args.length > 1) {
-    isEmbedded = getOptionValue('embedded', args[1]);
-  }
-
-  return j.callExpression(j.identifier('DS.attr'), [
-    j.literal(transform),
-    j.objectExpression([
-      j.property('init', j.identifier('modelClass'), args[0]),
-      j.property('init', j.identifier('embedded'), j.identifier(isEmbedded ? 'true' : 'false')),
-    ]),
-  ]);
-}
-
-function getOptionValue(name, options) {
-  let option = options.properties.find(p => p.key.name === name);
-  if (!option) {
-    return;
-  }
-  return option.value.value;
 }
 
 module.exports = function transformer(file, api) {
@@ -92,8 +71,9 @@ module.exports = function transformer(file, api) {
   source = migrateIntercomModelImport(j, file.source);
   source = migrateIntercomModelExtend(j, source);
   source = removeEmberModelImport(j, source);
-  source = migrateEmberModelAttr(j, source);
+  source = attrTransform(j, source);
   source = hasManyTransform(j, source);
   source = belongsToTransform(j, source);
+  source = removeJsonTypeImport(j, source);
   return source;
 };
