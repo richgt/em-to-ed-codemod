@@ -10,6 +10,7 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 ## Input / Output
 
 <!--FIXTURES_TOC_START-->
+* [default-values](#default-values)
 * [intercom-model](#intercom-model)
 * [model-attr](#model-attr)
 * [model-belongs-to__keys-dont-match](#model-belongs-to__keys-dont-match)
@@ -22,6 +23,37 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 <!--FIXTURES_TOC_END-->
 
 <!--FIXTURES_CONTENT_START-->
+---
+<a id="default-values">**default-values**</a>
+
+**Input** (<small>[default-values.input.js](transforms/em-to-ed/__testfixtures__/default-values.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import JsonType from 'embercom/models/types/json';
+
+export default IntercomModel.extend({
+  someBoolean: attr(Boolean, { defaultValue: true }),
+  someString: attr(String, { defaultValue: 'user' }),
+  avatar_emoji: attr(String, { defaultValue: DEFAULT_EMOJI }),
+  someArray: attr(Array, { defaultValue: [] }),
+  someJson: attr(JsonType, { defaultValue: {} }),
+});
+
+```
+
+**Output** (<small>[default-values.output.js](transforms/em-to-ed/__testfixtures__/default-values.output.js)</small>):
+```js
+import DS from 'ember-data';
+
+export default DS.Model.extend({
+  someBoolean: DS.attr('boolean', { defaultValue: true }),
+  someString: DS.attr('string', { defaultValue: 'user' }),
+  avatar_emoji: DS.attr('string', { defaultValue: DEFAULT_EMOJI }),
+  someArray: DS.attr('array', { defaultValue: () => [] }),
+  someJson: DS.attr({ defaultValue: () => ({}) }),
+});
+
+```
 ---
 <a id="intercom-model">**intercom-model**</a>
 
