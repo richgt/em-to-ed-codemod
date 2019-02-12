@@ -17,6 +17,7 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 * [model-belongs-to__keys-match](#model-belongs-to__keys-match)
 * [model-has-many__keys-dont-match](#model-has-many__keys-dont-match)
 * [model-has-many__keys-match](#model-has-many__keys-match)
+* [transform-types](#transform-types)
 <!--FIXTURES_TOC_END-->
 
 <!--FIXTURES_CONTENT_START-->
@@ -243,6 +244,40 @@ import Tag from 'embercom/models/tag';
 
 export default DS.Model.extend({
   tags: DS.attr('ember-model-has-many', { modelClass: Tag, embedded: true }),
+});
+
+```
+---
+<a id="transform-types">**transform-types**</a>
+
+**Input** (<small>[transform-types.input.js](transforms/em-to-ed/__testfixtures__/transform-types.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { attr } from 'ember-model';
+import JsonType from 'embercom/models/types/json';
+
+export default IntercomModel.extend({
+  emptyTransform: attr(),
+  someJson: attr(JsonType),
+  someArray: attr(Array),
+  someBoolean: attr(Boolean),
+  someNumber: attr(Number),
+  someString: attr(String),
+});
+
+```
+
+**Output** (<small>[transform-types.output.js](transforms/em-to-ed/__testfixtures__/transform-types.output.js)</small>):
+```js
+import DS from 'ember-data';
+
+export default DS.Model.extend({
+  emptyTransform: DS.attr(),
+  someJson: DS.attr(),
+  someArray: DS.attr('array'),
+  someBoolean: DS.attr('boolean'),
+  someNumber: DS.attr('number'),
+  someString: DS.attr('string'),
 });
 
 ```
