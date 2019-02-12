@@ -19,9 +19,9 @@
     js-tokens "^4.0.0"
 
 "@babel/parser@^7.0.0-beta.53":
-  version "7.2.3"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.2.3.tgz#32f5df65744b70888d17872ec106b02434ba1489"
-  integrity sha512-0LyEcVlfCoFmci8mXx8A5oIkpkOgyo8dRHtxBnK9RRBwxO2+JZPNsqtVEZQ7mJFPxnXF9lfmU24mHOPI0qnlkA==
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.3.2.tgz#95cdeddfc3992a6ca2a1315191c1679ca32c55cd"
+  integrity sha512-QzNUC2RO1gadg+fs21fi0Uu0OuGNzRKEmgCxoLNzbCdoprLwjfmZwzUrpUNfJPaVRwBpDY47A17yYEGWyRelnQ==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -253,6 +253,11 @@ ast-types@0.11.5:
   version "0.11.5"
   resolved "https://registry.yarnpkg.com/ast-types/-/ast-types-0.11.5.tgz#9890825d660c03c28339f315e9fa0a360e31ec28"
   integrity sha512-oJjo+5e7/vEc2FBK8gUalV0pba4L3VdBIs2EKhOLHLcOd2FgQIVQN9xb0eZ9IjEWyAL7vq6fGJxOvVvdCHNyMw==
+
+ast-types@0.11.7:
+  version "0.11.7"
+  resolved "https://registry.yarnpkg.com/ast-types/-/ast-types-0.11.7.tgz#f318bf44e339db6a320be0009ded64ec1471f46c"
+  integrity sha512-2mP3TwtkY/aTv5X3ZsMpNAbOnyoC/aMJwJSoaELPkHId0nSQgFcnU4dRW3isxiz7+zBexk0ym3WNVjMiQBnJSw==
 
 astral-regex@^1.0.0:
   version "1.0.0"
@@ -1216,9 +1221,9 @@ code-point-at@^1.0.0:
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
 codemod-cli@^0.2.8:
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/codemod-cli/-/codemod-cli-0.2.8.tgz#b6ed0e13c3de65148f88c6d064c90d15817876e1"
-  integrity sha512-hTqiUoDAF6k85rP/bnlX34ZI4CusShGNt2gDDvg3Yq4PLvjC5PC0eeS4Nb8m3HM+pmLfA2A6Ydv1BwFEB3ykqw==
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/codemod-cli/-/codemod-cli-0.2.9.tgz#98ca54796460b5df9b0f77b3b1e47504a9b82666"
+  integrity sha512-EgZ1Z7TY6+8dOTFe7FDsWfx4Zz9CBTWgY/V5f5BN9OsWsGe+iau5PM5V32o02rK9p/qrEGjQQ+6g134unJzaYA==
   dependencies:
     "@babel/parser" "^7.0.0-beta.53"
     chalk "^2.4.1"
@@ -1230,7 +1235,7 @@ codemod-cli@^0.2.8:
     import-local "^1.0.0"
     jscodeshift "^0.5.1"
     pkg-up "^2.0.0"
-    recast "^0.15.0"
+    recast "^0.16.1"
     yargs "^11.0.0"
 
 collection-visit@^1.0.0:
@@ -1313,9 +1318,9 @@ copy-descriptor@^0.1.0:
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
 
 core-js@^2.4.0, core-js@^2.5.0:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.2.tgz#267988d7268323b349e20b4588211655f0e83944"
-  integrity sha512-NdBPF/RVwPW6jr0NCILuyN9RiqLo2b1mddWHkUL+VnvcB7dzlnBJ1bXYntjpTGOgkZiiLWj2JxmOr7eGE3qK6g==
+  version "2.6.4"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.4.tgz#b8897c062c4d769dd30a0ac5c73976c47f92ea0d"
+  integrity sha512-05qQ5hXShcqGkPZpXEFLIpxayZscVD2kuMBZewxiIPPEagukO4mqgPA9CWhUvFBJfy3ODdK2p9xyHh7FTU9/7A==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -1917,9 +1922,9 @@ flat-cache@^1.2.1:
     write "^0.2.1"
 
 flow-parser@^0.*:
-  version "0.90.0"
-  resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.90.0.tgz#27f2f563dc4296bf0c555183bbf48cb6135b1b21"
-  integrity sha512-a6Ohgdzvf2e1/F8sI98qcPLtDIjLayRkRgAwrWHzHFMHCNq92jyRbRG0w5fGjs6xdI320Ud39HkI0Dk5OPs17g==
+  version "0.92.1"
+  resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.92.1.tgz#c81fb52b202c7b1195f253bb01ac6dd2f5c15dfc"
+  integrity sha512-l6rlAGgMTTRYPOj5XUzbCeZB2bsK2cimPcoQD06YtQC2BI2wu9AhMQH+FkKV2Kd1Aa9EMNxVyF05QzNaiYdObQ==
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
@@ -3975,6 +3980,16 @@ recast@^0.15.0:
   integrity sha512-nkAYNqarh73cMWRKFiPQ8I9dOLFvFk6SnG8u/LUlOYfArDOD/EjsVRAs860TlBLrpxqAXHGET/AUAVjdEymL5w==
   dependencies:
     ast-types "0.11.5"
+    esprima "~4.0.0"
+    private "~0.1.5"
+    source-map "~0.6.1"
+
+recast@^0.16.1:
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/recast/-/recast-0.16.2.tgz#3796ebad5fe49ed85473b479cd6df554ad725dc2"
+  integrity sha512-O/7qXi51DPjRVdbrpNzoBQH5dnAPQNbfoOFyRiUwreTMJfIHYOEBzwuH+c0+/BTSJ3CQyKs6ILSWXhESH6Op3A==
+  dependencies:
+    ast-types "0.11.7"
     esprima "~4.0.0"
     private "~0.1.5"
     source-map "~0.6.1"

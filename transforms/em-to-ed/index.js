@@ -1,7 +1,7 @@
 const { getParser } = require('codemod-cli').jscodeshift;
 const { getOptions } = require('codemod-cli');
-
-const FORMATTING_OPTIONS = { quote: 'single', trailingComma: true };
+const belongsToTransform = require('./util/belongs-to-transform');
+const FORMATTING = require('./util/formatting');
 
 function migrateIntercomModelImport(j, source) {
   return j(source)
@@ -18,7 +18,7 @@ function migrateIntercomModelImport(j, source) {
         ),
       );
     })
-    .toSource(FORMATTING_OPTIONS);
+    .toSource(FORMATTING);
 }
 
 function removeEmberModelImport(j, source) {
@@ -31,7 +31,7 @@ function removeEmberModelImport(j, source) {
     .forEach(path => {
       path.prune();
     })
-    .toSource(FORMATTING_OPTIONS);
+    .toSource(FORMATTING);
 }
 
 function migrateIntercomModelExtend(j, source) {
@@ -43,7 +43,7 @@ function migrateIntercomModelExtend(j, source) {
     .forEach(path => {
       path.replace(j.memberExpression(j.identifier('DS.Model'), j.identifier('extend')));
     })
-    .toSource(FORMATTING_OPTIONS);
+    .toSource(FORMATTING);
 }
 
 function migrateEmberModelAttr(j, source) {
@@ -56,7 +56,7 @@ function migrateEmberModelAttr(j, source) {
     .forEach(path => {
       path.replace(j.callExpression(j.identifier('DS.attr'), path.value.arguments));
     })
-    .toSource(FORMATTING_OPTIONS);
+    .toSource(FORMATTING);
 }
 
 function migrateEmberModelHasMany(j, source) {
@@ -69,20 +69,7 @@ function migrateEmberModelHasMany(j, source) {
     .forEach(path => {
       path.replace(emberModelTransform(j, 'ember-model-has-many', path.value.arguments));
     })
-    .toSource(FORMATTING_OPTIONS);
-}
-
-function migrateEmberModelBelongsTo(j, source) {
-  return j(source)
-    .find(j.CallExpression, {
-      callee: {
-        name: 'belongsTo',
-      },
-    })
-    .forEach(path => {
-      path.replace(emberModelTransform(j, 'ember-model-belongs-to', path.value.arguments));
-    })
-    .toSource(FORMATTING_OPTIONS);
+    .toSource(FORMATTING);
 }
 
 function emberModelTransform(j, transform, args) {
@@ -119,6 +106,6 @@ module.exports = function transformer(file, api) {
   source = removeEmberModelImport(j, source);
   source = migrateEmberModelAttr(j, source);
   source = migrateEmberModelHasMany(j, source);
-  source = migrateEmberModelBelongsTo(j, source);
+  source = belongsToTransform(j, source);
   return source;
 };
