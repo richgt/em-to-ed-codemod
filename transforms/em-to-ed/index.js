@@ -62,6 +62,19 @@ function removeJsonTypeImport(j, source) {
     .toSource(FORMATTING);
 }
 
+function stripId(j, source) {
+  return j(source)
+    .find(j.ObjectProperty, {
+      key: {
+        name: 'id',
+      },
+    })
+    .forEach(path => {
+      path.prune();
+    })
+    .toSource(FORMATTING);
+}
+
 module.exports = function transformer(file, api) {
   const j = getParser(api);
 
@@ -69,6 +82,7 @@ module.exports = function transformer(file, api) {
   source = migrateIntercomModelImport(j, file.source);
   source = migrateIntercomModelExtend(j, source);
   source = removeEmberModelImport(j, source);
+  source = stripId(j, source);
   source = attrTransform(j, source);
   source = hasManyTransform(j, source);
   source = belongsToTransform(j, source);
