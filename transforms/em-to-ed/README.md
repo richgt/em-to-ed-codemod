@@ -12,7 +12,9 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 <!--FIXTURES_TOC_START-->
 * [intercom-model](#intercom-model)
 * [model-attr](#model-attr)
-* [model-belongs-to](#model-belongs-to)
+* [model-belongs-to__keys-dont-match](#model-belongs-to__keys-dont-match)
+* [model-belongs-to__keys-dont-match__existing-computed-object-imports](#model-belongs-to__keys-dont-match__existing-computed-object-imports)
+* [model-belongs-to__keys-match](#model-belongs-to__keys-match)
 * [model-has-many](#model-has-many)
 <!--FIXTURES_TOC_END-->
 
@@ -59,44 +61,117 @@ export default DS.Model.extend({
 
 ```
 ---
-<a id="model-belongs-to">**model-belongs-to**</a>
+<a id="model-belongs-to__keys-dont-match">**model-belongs-to__keys-dont-match**</a>
 
-**Input** (<small>[model-belongs-to.input.js](transforms/em-to-ed/__testfixtures__/model-belongs-to.input.js)</small>):
+**Input** (<small>[model-belongs-to__keys-dont-match.input.js](transforms/em-to-ed/__testfixtures__/model-belongs-to__keys-dont-match.input.js)</small>):
 ```js
 import IntercomModel from 'embercom/models/types/intercom-model';
 import { belongsTo } from 'ember-model';
 import Tag from 'embercom/models/tag';
 import Admin from 'embercom/models/admin';
-import Team from 'embercom/models/team';
+import User from 'embercom/models/user';
 
 export default IntercomModel.extend({
   tag: belongsTo(Tag, { key: 'tag_id', embedded: true }),
   admin: belongsTo(Admin, { key: 'admin_id', embedded: false }),
-  team: belongsTo(Team, { key: 'team_id' }),
+  user: belongsTo(User, { key: 'user_id' }),
 });
 
 ```
 
-**Output** (<small>[model-belongs-to.output.js](transforms/em-to-ed/__testfixtures__/model-belongs-to.output.js)</small>):
+**Output** (<small>[model-belongs-to__keys-dont-match.output.js](transforms/em-to-ed/__testfixtures__/model-belongs-to__keys-dont-match.output.js)</small>):
+```js
+import { alias } from '@ember/object/computed';
+import { computed } from '@ember/object';
+import DS from 'ember-data';
+import Tag from 'embercom/models/tag';
+import Admin from 'embercom/models/admin';
+import User from 'embercom/models/user';
+
+export default DS.Model.extend({
+  tag_id: DS.attr('ember-model-belongs-to', { modelClass: Tag, embedded: true }),
+  tag: alias('tag_id'),
+
+  admin_id: DS.attr(),
+  admin: computed('admin_id', function() {
+    return Admin.find(this.admin_id);
+  }),
+
+  user_id: DS.attr(),
+  user: computed('user_id', function() {
+    return User.find(this.user_id);
+  }),
+});
+
+```
+---
+<a id="model-belongs-to__keys-dont-match__existing-computed-object-imports">**model-belongs-to__keys-dont-match__existing-computed-object-imports**</a>
+
+**Input** (<small>[model-belongs-to__keys-dont-match__existing-computed-object-imports.input.js](transforms/em-to-ed/__testfixtures__/model-belongs-to__keys-dont-match__existing-computed-object-imports.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { belongsTo } from 'ember-model';
+import Tag from 'embercom/models/tag';
+import Admin from 'embercom/models/admin';
+import { application } from '@ember/object';
+import { or } from '@ember/object/computed';
+
+export default IntercomModel.extend({
+  tag: belongsTo(Tag, { key: 'tag_id', embedded: true }),
+  admin: belongsTo(Admin, { key: 'admin_id', embedded: false }),
+});
+
+```
+
+**Output** (<small>[model-belongs-to__keys-dont-match__existing-computed-object-imports.output.js](transforms/em-to-ed/__testfixtures__/model-belongs-to__keys-dont-match__existing-computed-object-imports.output.js)</small>):
 ```js
 import DS from 'ember-data';
 import Tag from 'embercom/models/tag';
 import Admin from 'embercom/models/admin';
-import Team from 'embercom/models/team';
+import { application, computed } from '@ember/object';
+import { or, alias } from '@ember/object/computed';
 
 export default DS.Model.extend({
-  tag: DS.attr('ember-model-belongs-to', {
-    modelClass: Tag,
-    embedded: true,
+  tag_id: DS.attr('ember-model-belongs-to', { modelClass: Tag, embedded: true }),
+  tag: alias('tag_id'),
+
+  admin_id: DS.attr(),
+  admin: computed('admin_id', function() {
+    return Admin.find(this.admin_id);
   }),
-  admin: DS.attr('ember-model-belongs-to', {
-    modelClass: Admin,
-    embedded: false,
-  }),
-  team: DS.attr('ember-model-belongs-to', {
-    modelClass: Team,
-    embedded: false,
-  }),
+});
+
+```
+---
+<a id="model-belongs-to__keys-match">**model-belongs-to__keys-match**</a>
+
+**Input** (<small>[model-belongs-to__keys-match.input.js](transforms/em-to-ed/__testfixtures__/model-belongs-to__keys-match.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { belongsTo } from 'ember-model';
+import Tag from 'embercom/models/tag';
+import Admin from 'embercom/models/admin';
+import User from 'embercom/models/user';
+
+export default IntercomModel.extend({
+  tag: belongsTo(Tag, { key: 'tag', embedded: true }),
+  admin: belongsTo(Admin, { key: 'admin', embedded: false }),
+  user: belongsTo(User, { key: 'user' }),
+});
+
+```
+
+**Output** (<small>[model-belongs-to__keys-match.output.js](transforms/em-to-ed/__testfixtures__/model-belongs-to__keys-match.output.js)</small>):
+```js
+import DS from 'ember-data';
+import Tag from 'embercom/models/tag';
+import Admin from 'embercom/models/admin';
+import User from 'embercom/models/user';
+
+export default DS.Model.extend({
+  tag: DS.attr('ember-model-belongs-to', { modelClass: Tag, embedded: true }),
+  admin: DS.attr('ember-model-belongs-to', { modelClass: Admin, embedded: false }),
+  user: DS.attr('ember-model-belongs-to', { modelClass: User, embedded: false }),
 });
 
 ```
@@ -142,4 +217,4 @@ export default DS.Model.extend({
 });
 
 ```
-<!--FIXTURE_CONTENT_END-->
+<!--FIXTURES_CONTENT_END-->
