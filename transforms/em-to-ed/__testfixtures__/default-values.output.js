@@ -5,5 +5,5 @@ export default DS.Model.extend({
   someString: DS.attr('string', { defaultValue: 'user' }),
   avatar_emoji: DS.attr('string', { defaultValue: DEFAULT_EMOJI }),
   someArray: DS.attr('array', { defaultValue: () => [] }),
-  someJson: DS.attr({ defaultValue: () => {} }),
+  someJson: DS.attr({ defaultValue: () => ({}) }),
 });
