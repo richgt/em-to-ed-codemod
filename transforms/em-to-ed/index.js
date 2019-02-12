@@ -1,6 +1,7 @@
 const { getParser } = require('codemod-cli').jscodeshift;
 const { getOptions } = require('codemod-cli');
 const belongsToTransform = require('./util/belongs-to-transform');
+const hasManyTransform = require('./util/has-many-transform');
 const FORMATTING = require('./util/formatting');
 
 function migrateIntercomModelImport(j, source) {
@@ -59,19 +60,6 @@ function migrateEmberModelAttr(j, source) {
     .toSource(FORMATTING);
 }
 
-function migrateEmberModelHasMany(j, source) {
-  return j(source)
-    .find(j.CallExpression, {
-      callee: {
-        name: 'hasMany',
-      },
-    })
-    .forEach(path => {
-      path.replace(emberModelTransform(j, 'ember-model-has-many', path.value.arguments));
-    })
-    .toSource(FORMATTING);
-}
-
 function emberModelTransform(j, transform, args) {
   let isEmbedded;
 
@@ -105,7 +93,7 @@ module.exports = function transformer(file, api) {
   source = migrateIntercomModelExtend(j, source);
   source = removeEmberModelImport(j, source);
   source = migrateEmberModelAttr(j, source);
-  source = migrateEmberModelHasMany(j, source);
+  source = hasManyTransform(j, source);
   source = belongsToTransform(j, source);
   return source;
 };

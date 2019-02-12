@@ -15,7 +15,8 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 * [model-belongs-to__keys-dont-match](#model-belongs-to__keys-dont-match)
 * [model-belongs-to__keys-dont-match__existing-computed-object-imports](#model-belongs-to__keys-dont-match__existing-computed-object-imports)
 * [model-belongs-to__keys-match](#model-belongs-to__keys-match)
-* [model-has-many](#model-has-many)
+* [model-has-many__keys-dont-match](#model-has-many__keys-dont-match)
+* [model-has-many__keys-match](#model-has-many__keys-match)
 <!--FIXTURES_TOC_END-->
 
 <!--FIXTURES_CONTENT_START-->
@@ -176,44 +177,72 @@ export default DS.Model.extend({
 
 ```
 ---
-<a id="model-has-many">**model-has-many**</a>
+<a id="model-has-many__keys-dont-match">**model-has-many__keys-dont-match**</a>
 
-**Input** (<small>[model-has-many.input.js](transforms/em-to-ed/__testfixtures__/model-has-many.input.js)</small>):
+**Input** (<small>[model-has-many__keys-dont-match.input.js](transforms/em-to-ed/__testfixtures__/model-has-many__keys-dont-match.input.js)</small>):
 ```js
 import IntercomModel from 'embercom/models/types/intercom-model';
 import { hasMany } from 'ember-model';
-import Tag from 'embercom/models/tag';
-import Admin from 'embercom/models/admin';
+import Permission from 'embercom/models/permission';
+import User from 'embercom/models/user';
 import Team from 'embercom/models/team';
+import ExternalProfile from 'embercom/models/external-profile';
 
 export default IntercomModel.extend({
-  tags: hasMany(Tag, { key: 'tags', embedded: true }),
-  admin: hasMany(Admin, { key: 'admin_id', embedded: false }),
-  team: hasMany(Team, { key: 'team_id' }),
+  availablePermissions: hasMany(Permission, { key: 'available_roles', embedded: true }),
+  users: hasMany(User, { key: 'user_ids', embedded: false }),
+  team: hasMany(Team, { key: 'team_ids' }),
+  externalProfile: hasMany(ExternalProfile),
 });
 
 ```
 
-**Output** (<small>[model-has-many.output.js](transforms/em-to-ed/__testfixtures__/model-has-many.output.js)</small>):
+**Output** (<small>[model-has-many__keys-dont-match.output.js](transforms/em-to-ed/__testfixtures__/model-has-many__keys-dont-match.output.js)</small>):
+```js
+import { alias } from '@ember/object/computed';
+import DS from 'ember-data';
+import Permission from 'embercom/models/permission';
+import User from 'embercom/models/user';
+import Team from 'embercom/models/team';
+import ExternalProfile from 'embercom/models/external-profile';
+
+export default DS.Model.extend({
+  available_roles: DS.attr('ember-model-has-many', { modelClass: Permission, embedded: true }),
+  availablePermissions: alias('available_roles'),
+
+  // CODE MIGRATION HINT: This is an async Ember Model `hasMany` relationship and due to ambiguity it can't be automatically migrated. See the following docs for advice on how to migrate this relationship https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#updating-hasmany-relationships
+  users: hasMany(User, { key: 'user_ids', embedded: false }),
+
+  // CODE MIGRATION HINT: This is an async Ember Model `hasMany` relationship and due to ambiguity it can't be automatically migrated. See the following docs for advice on how to migrate this relationship https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#updating-hasmany-relationships
+  team: hasMany(Team, { key: 'team_ids' }),
+
+  // CODE MIGRATION HINT: This is an async Ember Model `hasMany` relationship and due to ambiguity it can't be automatically migrated. See the following docs for advice on how to migrate this relationship https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#updating-hasmany-relationships
+  externalProfile: hasMany(ExternalProfile),
+});
+
+```
+---
+<a id="model-has-many__keys-match">**model-has-many__keys-match**</a>
+
+**Input** (<small>[model-has-many__keys-match.input.js](transforms/em-to-ed/__testfixtures__/model-has-many__keys-match.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { hasMany } from 'ember-model';
+import Tag from 'embercom/models/tag';
+
+export default IntercomModel.extend({
+  tags: hasMany(Tag, { key: 'tags', embedded: true }),
+});
+
+```
+
+**Output** (<small>[model-has-many__keys-match.output.js](transforms/em-to-ed/__testfixtures__/model-has-many__keys-match.output.js)</small>):
 ```js
 import DS from 'ember-data';
 import Tag from 'embercom/models/tag';
-import Admin from 'embercom/models/admin';
-import Team from 'embercom/models/team';
 
 export default DS.Model.extend({
-  tags: DS.attr('ember-model-has-many', {
-    modelClass: Tag,
-    embedded: true,
-  }),
-  admin: DS.attr('ember-model-has-many', {
-    modelClass: Admin,
-    embedded: false,
-  }),
-  team: DS.attr('ember-model-has-many', {
-    modelClass: Team,
-    embedded: false,
-  }),
+  tags: DS.attr('ember-model-has-many', { modelClass: Tag, embedded: true }),
 });
 
 ```
