@@ -17,6 +17,7 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 * [model-belongs-to__keys-match](#model-belongs-to__keys-match)
 * [model-has-many__keys-dont-match](#model-has-many__keys-dont-match)
 * [model-has-many__keys-match](#model-has-many__keys-match)
+* [strip-id](#strip-id)
 * [transform-types](#transform-types)
 <!--FIXTURES_TOC_END-->
 
@@ -244,6 +245,30 @@ import Tag from 'embercom/models/tag';
 
 export default DS.Model.extend({
   tags: DS.attr('ember-model-has-many', { modelClass: Tag, embedded: true }),
+});
+
+```
+---
+<a id="strip-id">**strip-id**</a>
+
+**Input** (<small>[strip-id.input.js](transforms/em-to-ed/__testfixtures__/strip-id.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import JsonType from 'embercom/models/types/json';
+
+export default IntercomModel.extend({
+  id: attr(),
+  someBoolean: attr(Boolean),
+});
+
+```
+
+**Output** (<small>[strip-id.output.js](transforms/em-to-ed/__testfixtures__/strip-id.output.js)</small>):
+```js
+import DS from 'ember-data';
+
+export default DS.Model.extend({
+  someBoolean: DS.attr('boolean'),
 });
 
 ```
