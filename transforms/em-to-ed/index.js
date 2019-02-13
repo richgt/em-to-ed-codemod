@@ -2,6 +2,7 @@ const { getParser } = require('codemod-cli').jscodeshift;
 const belongsToTransform = require('./util/belongs-to-transform');
 const hasManyTransform = require('./util/has-many-transform');
 const attrTransform = require('./util/attr-transform');
+const annotateEmberModelConfiguration = require('./util/annotate-ember-model-configuration');
 const closestAncestorOfType = require('./util/closest-ancestor-of-type');
 const getAncestorsOfType = require('./util/get-ancestors-of-type');
 const removeImportSpecifier = require('./util/remove-import-specifier');
@@ -160,5 +161,6 @@ module.exports = function transformer(file, api) {
   source = belongsToTransform(j, source);
   source = removeJsonTypeImport(j, source);
   source = migrateGetEmberDataStore(j, source);
+  source = annotateEmberModelConfiguration(j, source);
   return source;
 };
