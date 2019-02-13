@@ -1,7 +1,7 @@
 const FORMATTING = require('./formatting');
 
 function addImportSpecifier(j, code, importSpecifier, source) {
-  let needsImportAdded = true;
+  let needsImportDeclarationAdded = true;
   code = j(code)
     .find(j.ImportDeclaration, {
       source: {
@@ -14,12 +14,12 @@ function addImportSpecifier(j, code, importSpecifier, source) {
       );
       if (!hasComputedSpecifier) {
         path.value.specifiers.push(j.importSpecifier(j.identifier(importSpecifier)));
-        needsImportAdded = false;
       }
+      needsImportDeclarationAdded = false;
     })
     .toSource(FORMATTING);
 
-  if (needsImportAdded) {
+  if (needsImportDeclarationAdded) {
     code = j(code)
       .find(j.Program)
       .forEach(path => {
