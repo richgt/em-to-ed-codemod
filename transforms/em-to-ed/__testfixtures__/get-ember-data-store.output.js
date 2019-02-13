@@ -1,4 +1,5 @@
 import DS from 'ember-data';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
 
 export default DS.Model.extend({
   someFunction() {

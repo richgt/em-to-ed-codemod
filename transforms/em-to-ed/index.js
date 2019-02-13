@@ -3,6 +3,8 @@ const belongsToTransform = require('./util/belongs-to-transform');
 const hasManyTransform = require('./util/has-many-transform');
 const attrTransform = require('./util/attr-transform');
 const closestAncestorOfType = require('./util/closest-ancestor-of-type');
+const getAncestorsOfType = require('./util/get-ancestors-of-type');
+const removeImportSpecifier = require('./util/remove-import-specifier');
 const FORMATTING = require('./util/formatting');
 
 function migrateIntercomModelImport(j, source) {
@@ -68,11 +70,81 @@ function stripId(j, source) {
       key: {
         name: 'id',
       },
+      value: {
+        type: 'CallExpression',
+        callee: {
+          name: 'attr',
+        },
+      },
     })
     .forEach(path => {
       path.prune();
     })
     .toSource(FORMATTING);
+}
+
+function migrateGetEmberDataStore(j, source) {
+  let isUsingGetEmberDataStoreInReopenClass = false;
+  let code = j(source)
+    .find(j.VariableDeclarator, {
+      id: {
+        name: 'store',
+      },
+      init: {
+        callee: {
+          name: 'getEmberDataStore',
+        },
+      },
+    })
+    .forEach(path => {
+      if (isWithinReopenClass(path)) {
+        isUsingGetEmberDataStoreInReopenClass = true;
+        return;
+      }
+      if (closestAncestorOfType(path, /VariableDeclaration/)) {
+        path.prune();
+      }
+    })
+    .toSource(FORMATTING);
+
+  code = j(code)
+    .find(j.CallExpression, {
+      callee: {
+        type: 'MemberExpression',
+        object: {
+          name: 'store',
+        },
+      },
+    })
+    .forEach(path => {
+      if (isWithinReopenClass(path)) {
+        return;
+      }
+      j(path).replaceWith(
+        j.callExpression(
+          j.memberExpression(
+            j.memberExpression(j.thisExpression(), j.identifier('store')),
+            path.value.callee.property,
+          ),
+          path.value.arguments,
+        ),
+      );
+    })
+    .toSource(FORMATTING);
+
+  if (isUsingGetEmberDataStoreInReopenClass) {
+    code = removeImportSpecifier(j, code, 'getEmberDataStore', 'embercom/helpers/container-lookup');
+  }
+
+  return code;
+}
+
+function isWithinReopenClass(path) {
+  let ancestorCallExpressions = getAncestorsOfType(path, /CallExpression/);
+  let callExpression = ancestorCallExpressions.find(path =>
+    /extend|reopenClass/.test(path.value.callee.property.name),
+  );
+  return callExpression.value.callee.property.name === 'reopenClass';
 }
 
 module.exports = function transformer(file, api) {
@@ -87,5 +159,6 @@ module.exports = function transformer(file, api) {
   source = hasManyTransform(j, source);
   source = belongsToTransform(j, source);
   source = removeJsonTypeImport(j, source);
+  source = migrateGetEmberDataStore(j, source);
   return source;
 };
