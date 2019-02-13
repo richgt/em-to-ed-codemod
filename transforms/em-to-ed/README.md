@@ -11,6 +11,9 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 
 <!--FIXTURES_TOC_START-->
 * [default-values](#default-values)
+* [get-ember-data-store](#get-ember-data-store)
+* [get-ember-data-store__reopen-class](#get-ember-data-store__reopen-class)
+* [get-ember-data-store__reopen-class__other-usage](#get-ember-data-store__reopen-class__other-usage)
 * [intercom-model](#intercom-model)
 * [model-attr](#model-attr)
 * [model-belongs-to__keys-dont-match](#model-belongs-to__keys-dont-match)
@@ -51,6 +54,104 @@ export default DS.Model.extend({
   avatar_emoji: DS.attr('string', { defaultValue: DEFAULT_EMOJI }),
   someArray: DS.attr('array', { defaultValue: () => [] }),
   someJson: DS.attr({ defaultValue: () => ({}) }),
+});
+
+```
+---
+<a id="get-ember-data-store">**get-ember-data-store**</a>
+
+**Input** (<small>[get-ember-data-store.input.js](transforms/em-to-ed/__testfixtures__/get-ember-data-store.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
+
+export default IntercomModel.extend({
+  someFunction() {
+    let store = getEmberDataStore();
+    store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+});
+
+```
+
+**Output** (<small>[get-ember-data-store.output.js](transforms/em-to-ed/__testfixtures__/get-ember-data-store.output.js)</small>):
+```js
+import DS from 'ember-data';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
+
+export default DS.Model.extend({
+  someFunction() {
+    this.store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+});
+
+```
+---
+<a id="get-ember-data-store__reopen-class">**get-ember-data-store__reopen-class**</a>
+
+**Input** (<small>[get-ember-data-store__reopen-class.input.js](transforms/em-to-ed/__testfixtures__/get-ember-data-store__reopen-class.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
+
+export default IntercomModel.extend({}).reopenClass({
+  someFunction() {
+    let store = getEmberDataStore();
+    store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+});
+
+```
+
+**Output** (<small>[get-ember-data-store__reopen-class.output.js](transforms/em-to-ed/__testfixtures__/get-ember-data-store__reopen-class.output.js)</small>):
+```js
+import DS from 'ember-data';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
+
+export default DS.Model.extend({}).reopenClass({
+  someFunction() {
+    let store = getEmberDataStore();
+    store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+});
+
+```
+---
+<a id="get-ember-data-store__reopen-class__other-usage">**get-ember-data-store__reopen-class__other-usage**</a>
+
+**Input** (<small>[get-ember-data-store__reopen-class__other-usage.input.js](transforms/em-to-ed/__testfixtures__/get-ember-data-store__reopen-class__other-usage.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
+
+export default IntercomModel.extend({
+  otherFunction() {
+    let store = getEmberDataStore();
+    store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+}).reopenClass({
+  someFunction() {
+    let store = getEmberDataStore();
+    store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+});
+
+```
+
+**Output** (<small>[get-ember-data-store__reopen-class__other-usage.output.js](transforms/em-to-ed/__testfixtures__/get-ember-data-store__reopen-class__other-usage.output.js)</small>):
+```js
+import DS from 'ember-data';
+import { getEmberDataStore } from 'embercom/lib/container-lookup';
+
+export default DS.Model.extend({
+  otherFunction() {
+    this.store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
+}).reopenClass({
+  someFunction() {
+    let store = getEmberDataStore();
+    store.pushPayload({ 'logs-settings': [{ id: '12' }] });
+  },
 });
 
 ```
