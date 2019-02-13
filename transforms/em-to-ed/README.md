@@ -11,6 +11,7 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 
 <!--FIXTURES_TOC_START-->
 * [default-values](#default-values)
+* [ember-model-configuration](#ember-model-configuration)
 * [get-ember-data-store](#get-ember-data-store)
 * [get-ember-data-store__reopen-class](#get-ember-data-store__reopen-class)
 * [get-ember-data-store__reopen-class__other-usage](#get-ember-data-store__reopen-class__other-usage)
@@ -54,6 +55,51 @@ export default DS.Model.extend({
   avatar_emoji: DS.attr('string', { defaultValue: DEFAULT_EMOJI }),
   someArray: DS.attr('array', { defaultValue: () => [] }),
   someJson: DS.attr({ defaultValue: () => ({}) }),
+});
+
+```
+---
+<a id="ember-model-configuration">**ember-model-configuration**</a>
+
+**Input** (<small>[ember-model-configuration.input.js](transforms/em-to-ed/__testfixtures__/ember-model-configuration.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+
+export default IntercomModel.extend({
+  someValue: attr(),
+}).reopenClass({
+  adapter: ConversationPartRESTAdapter.create(),
+  collectionKey: 'conversation_parts',
+  primaryKey: 'id',
+  primaryKey: 'app_id',
+  rootKey: '',
+  url: '/ember/conversation_parts',
+  urlSuffix: '.json',
+});
+
+```
+
+**Output** (<small>[ember-model-configuration.output.js](transforms/em-to-ed/__testfixtures__/ember-model-configuration.output.js)</small>):
+```js
+import DS from 'ember-data';
+
+export default DS.Model.extend({
+  someValue: DS.attr(),
+}).reopenClass({
+  // CODE MIGRATION HINT: This model had a custom `adapter` defined so it may contain functionality which does not come out of the box in Ember Data. Visit the docs at https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#migrating-custom-ember-model-configuration-to-ember-data to see how to address this issue.
+  adapter: ConversationPartRESTAdapter.create(),
+
+  // CODE MIGRATION HINT: This model had a `collectionKey` defined so its payload will not automatically map to Ember Data. Visit the docs at https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#migrating-custom-ember-model-configuration-to-ember-data to see how to address this issue.
+  collectionKey: 'conversation_parts',
+
+  // CODE MIGRATION HINT: This model had a custom `primaryKey` defined so you may need configure this in an Ember Data serializer. Visit the docs at https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#migrating-custom-ember-model-configuration-to-ember-data to see how to address this issue.
+  primaryKey: 'app_id',
+
+  // CODE MIGRATION HINT: This model had a custom `url` defined so its URL may not automatically map to Ember Data's. Visit the docs at https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#migrating-custom-ember-model-configuration-to-ember-data to see how to address this issue.
+  url: '/ember/conversation_parts',
+
+  // CODE MIGRATION HINT: This model had a custom `urlSuffix` defined so you may need to configure this in an Ember Data serializer. Visit the docs at https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#migrating-custom-ember-model-configuration-to-ember-data to see how to address this issue.
+  urlSuffix: '.json',
 });
 
 ```
