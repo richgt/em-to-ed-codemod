@@ -295,7 +295,7 @@ import IntercomModel from 'embercom/models/types/intercom-model';
 import { belongsTo } from 'ember-model';
 import Tag from 'embercom/models/tag';
 import Admin from 'embercom/models/admin';
-import { application } from '@ember/object';
+import { application, computed } from '@ember/object';
 import { or } from '@ember/object/computed';
 
 export default IntercomModel.extend({
