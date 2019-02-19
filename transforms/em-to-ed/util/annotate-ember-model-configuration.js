@@ -41,6 +41,9 @@ function annotateEmberModelConfiguration(j, source) {
     })
     .forEach(path => {
       let obj = path.value.arguments.find(n => n.type === 'ObjectExpression');
+      if (!obj) {
+        return;
+      }
       obj.properties
         .filter(prop => EMBER_MODEL_CONFIGURATION_KEYS.includes(prop.key.name))
         .forEach(prop => {
