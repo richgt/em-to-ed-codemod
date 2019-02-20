@@ -15,6 +15,7 @@ const COMMENT_TEXT = {
 
 const EMBER_MODEL_CONFIGURATION_KEYS = [
   'adapter',
+  'camelizeKeys',
   'collectionKey',
   'primaryKey',
   'url',
