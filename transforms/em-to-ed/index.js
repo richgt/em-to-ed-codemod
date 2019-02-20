@@ -39,6 +39,15 @@ function removeEmberModelImport(j, source) {
     .toSource(FORMATTING);
 }
 
+function removeEmberModelESLintComment(j, source) {
+  return j(source)
+    .find(j.Comment, { value: 'eslint-disable-next-line intercom/no-ember-model' })
+    .forEach(path => {
+      j(path).remove();
+    })
+    .toSource(FORMATTING);
+}
+
 function migrateIntercomModelExtend(j, source) {
   return j(source)
     .find(j.MemberExpression, {
@@ -155,6 +164,7 @@ module.exports = function transformer(file, api) {
   source = migrateIntercomModelImport(j, file.source);
   source = migrateIntercomModelExtend(j, source);
   source = removeEmberModelImport(j, source);
+  source = removeEmberModelESLintComment(j, source);
   source = stripId(j, source);
   source = attrTransform(j, source);
   source = hasManyTransform(j, source);
