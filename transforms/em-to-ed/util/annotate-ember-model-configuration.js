@@ -15,6 +15,7 @@ const COMMENT_TEXT = {
 
 const EMBER_MODEL_CONFIGURATION_KEYS = [
   'adapter',
+  'camelizeKeys',
   'collectionKey',
   'primaryKey',
   'url',
@@ -29,9 +30,30 @@ function addComment(j, path, text) {
     path.comments.push(comment);
   }
 }
+function isUsingSimpleAdapter(prop) {
+  return (
+    prop.key.name === 'adapter' &&
+    prop.value.callee.object.name === 'RestAdapter' &&
+    prop.value.arguments.length === 0
+  );
+}
+
+function removeRestAdapterImport(j, source) {
+  return j(source)
+    .find(j.ImportDeclaration, {
+      source: {
+        value: 'embercom/models/adapters/rest-adapter',
+      },
+    })
+    .forEach(path => {
+      path.prune();
+    })
+    .toSource(FORMATTING);
+}
 
 function annotateEmberModelConfiguration(j, source) {
-  return j(source)
+  let shouldRemoveAdapter;
+  let code = j(source)
     .find(j.CallExpression, {
       callee: {
         property: {
@@ -47,9 +69,12 @@ function annotateEmberModelConfiguration(j, source) {
       obj.properties
         .filter(prop => EMBER_MODEL_CONFIGURATION_KEYS.includes(prop.key.name))
         .forEach(prop => {
+          shouldRemoveAdapter = shouldRemoveAdapter || isUsingSimpleAdapter(prop);
           // Remove empty configuration keys or `primaryKey: 'id'`
           if (
             (prop.key.name === 'primaryKey' && prop.value.value === 'id') ||
+            prop.key.name === 'camelizeKeys' ||
+            shouldRemoveAdapter ||
             (prop.value.type.includes('Literal') && !prop.value.value)
           ) {
             let propertyIndex = obj.properties.findIndex(p => p.value.value === prop.value.value);
@@ -60,6 +85,10 @@ function annotateEmberModelConfiguration(j, source) {
         });
     })
     .toSource(FORMATTING);
+  if (shouldRemoveAdapter) {
+    code = removeRestAdapterImport(j, code);
+  }
+  return code;
 }
 
 module.exports = annotateEmberModelConfiguration;

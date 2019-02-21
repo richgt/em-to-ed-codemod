@@ -4,6 +4,7 @@ export default IntercomModel.extend({
   someValue: attr(),
 }).reopenClass({
   adapter: ConversationPartRESTAdapter.create(),
+  camelizeKeys: true,
   collectionKey: 'conversation_parts',
   primaryKey: 'id',
   primaryKey: 'app_id',
