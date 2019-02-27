@@ -22,6 +22,8 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 * [model-belongs-to__keys-match](#model-belongs-to__keys-match)
 * [model-has-many__keys-dont-match](#model-has-many__keys-dont-match)
 * [model-has-many__keys-match](#model-has-many__keys-match)
+* [reopen-class__no-properties](#reopen-class__no-properties)
+* [reopen-class__simple-adapter](#reopen-class__simple-adapter)
 * [strip-id](#strip-id)
 * [transform-types](#transform-types)
 <!--FIXTURES_TOC_END-->
@@ -35,6 +37,7 @@ npx github:patocallaghan/em-to-ed-codemod em-to-ed path/of/files/ or/some**/*glo
 import IntercomModel from 'embercom/models/types/intercom-model';
 import JsonType from 'embercom/models/types/json';
 
+//eslint-disable-next-line intercom/no-ember-model
 export default IntercomModel.extend({
   someBoolean: attr(Boolean, { defaultValue: true }),
   someString: attr(String, { defaultValue: 'user' }),
@@ -69,6 +72,7 @@ export default IntercomModel.extend({
   someValue: attr(),
 }).reopenClass({
   adapter: ConversationPartRESTAdapter.create(),
+  camelizeKeys: true,
   collectionKey: 'conversation_parts',
   primaryKey: 'id',
   primaryKey: 'app_id',
@@ -425,6 +429,51 @@ import Tag from 'embercom/models/tag';
 export default DS.Model.extend({
   tags: DS.attr('ember-model-has-many', { modelClass: Tag, embedded: true }),
 });
+
+```
+---
+<a id="reopen-class__no-properties">**reopen-class__no-properties**</a>
+
+**Input** (<small>[reopen-class__no-properties.input.js](transforms/em-to-ed/__testfixtures__/reopen-class__no-properties.input.js)</small>):
+```js
+import PredefinedSegmentIconMap from 'embercom/models/data/predefined-segment-icon-map';
+import IntercomModel from 'embercom/models/types/intercom-model';
+
+let SegmentModel = IntercomModel.extend({}).reopenClass(PredefinedSegmentIconMap);
+
+export default SegmentModel;
+
+```
+
+**Output** (<small>[reopen-class__no-properties.output.js](transforms/em-to-ed/__testfixtures__/reopen-class__no-properties.output.js)</small>):
+```js
+import PredefinedSegmentIconMap from 'embercom/models/data/predefined-segment-icon-map';
+import DS from 'ember-data';
+
+let SegmentModel = DS.Model.extend({}).reopenClass(PredefinedSegmentIconMap);
+
+export default SegmentModel;
+
+```
+---
+<a id="reopen-class__simple-adapter">**reopen-class__simple-adapter**</a>
+
+**Input** (<small>[reopen-class__simple-adapter.input.js](transforms/em-to-ed/__testfixtures__/reopen-class__simple-adapter.input.js)</small>):
+```js
+import IntercomModel from 'embercom/models/types/intercom-model';
+import RestAdapter from 'embercom/models/adapters/rest-adapter';
+
+export default IntercomModel.extend({}).reopenClass({
+  adapter: RestAdapter.create(),
+});
+
+```
+
+**Output** (<small>[reopen-class__simple-adapter.output.js](transforms/em-to-ed/__testfixtures__/reopen-class__simple-adapter.output.js)</small>):
+```js
+import DS from 'ember-data';
+
+export default DS.Model.extend({}).reopenClass({});
 
 ```
 ---
