@@ -1,3 +1,5 @@
+const addComment = require('./add-comment');
+
 const FORMATTING = require('./formatting');
 const TRANSFORM_MAPPINGS = {
   String: 'string',
@@ -6,6 +8,8 @@ const TRANSFORM_MAPPINGS = {
   Array: 'array',
   JsonType: '',
 };
+const SERIALIZE_DESERIALIZE_COMMENT =
+  ' CODE MIGRATION HINT: Ember Data does not support having the serialize/deserialize hooks as part of `DS.attr`. https://github.com/intercom/embercom/wiki/Converting-a-model-from-ember-model-to-ember-data#deserializeserialize.';
 
 function attrTransform(j, source) {
   return j(source)
@@ -38,6 +42,7 @@ function migrateAttrParams(j, params) {
   }
 
   if (paramsContainObjectExpression(params)) {
+    params = transformSerializeDeserialize(j, params);
     params = transformDefaultValueObjectToArrowFunction(j, params);
   }
 
@@ -62,6 +67,17 @@ function paramsContainObjectExpression(params) {
     (params.length > 1 && params[1].type === 'ObjectExpression') ||
     (params.length && params[0].type === 'ObjectExpression')
   );
+}
+
+function transformSerializeDeserialize(j, params) {
+  let objectExpIndex = params.findIndex(p => p.type === 'ObjectExpression');
+  let objectExp = params[objectExpIndex];
+  objectExp.properties
+    .filter(prop => /deserialize|serialize/g.test(prop.key.name))
+    .forEach(prop => {
+      addComment(j, prop, SERIALIZE_DESERIALIZE_COMMENT);
+    });
+  return params;
 }
 
 function transformDefaultValueObjectToArrowFunction(j, params) {
