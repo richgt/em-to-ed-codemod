@@ -151,9 +151,12 @@ function migrateGetEmberDataStore(j, source) {
 
 function isWithinReopenClass(path) {
   let ancestorCallExpressions = getAncestorsOfType(path, /CallExpression/);
-  let callExpression = ancestorCallExpressions.find(path =>
-    /extend|reopenClass/.test(path.value.callee.property.name),
-  );
+  let callExpression = ancestorCallExpressions.find(path => {
+    if (!path.value || !path.value.callee || !path.value.callee.property) {
+      return false;
+    }
+    return /extend|reopenClass/.test(path.value.callee.property.name);
+  });
   return callExpression.value.callee.property.name === 'reopenClass';
 }
 
