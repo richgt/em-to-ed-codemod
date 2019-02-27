@@ -6,4 +6,23 @@ export default IntercomModel.extend({
     let store = getEmberDataStore();
     store.pushPayload({ 'logs-settings': [{ id: '12' }] });
   },
+  solutions: computed(function() {
+    let store = getEmberDataStore();
+
+    store.pushPayload('solution', { solutions: solutionsFixture });
+
+    return store.peekAll('solution');
+  }).volatile(),
+  products: attr({
+    serialize(products) {
+      return products.map(p => p.serialize());
+    },
+    deserialize(products = []) {
+      let store = getEmberDataStore();
+
+      store.pushPayload('product', { products });
+
+      return store.peekAll('product');
+    },
+  }),
 });
