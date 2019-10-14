@@ -6,6 +6,7 @@ const TRANSFORM_MAPPINGS = {
   Boolean: 'boolean',
   Number: 'number',
   Array: 'array',
+  MoneyProto: 'money-proto',
   JsonType: '',
 };
 const SERIALIZE_DESERIALIZE_COMMENT =
