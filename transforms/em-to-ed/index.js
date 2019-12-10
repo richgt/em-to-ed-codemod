@@ -4,15 +4,13 @@ const hasManyTransform = require('./util/has-many-transform');
 const attrTransform = require('./util/attr-transform');
 const annotateEmberModelConfiguration = require('./util/annotate-ember-model-configuration');
 const closestAncestorOfType = require('./util/closest-ancestor-of-type');
-const getAncestorsOfType = require('./util/get-ancestors-of-type');
-const removeImportSpecifier = require('./util/remove-import-specifier');
 const FORMATTING = require('./util/formatting');
 
-function migrateIntercomModelImport(j, source) {
+function migrateBaseModelImport(j, source) {
   return j(source)
     .find(j.ImportDeclaration, {
       source: {
-        value: 'embercom/models/types/intercom-model',
+        value: 'dashboard/models/base_model',
       },
     })
     .forEach(path => {
@@ -48,10 +46,10 @@ function removeEmberModelESLintComment(j, source) {
     .toSource(FORMATTING);
 }
 
-function migrateIntercomModelExtend(j, source) {
+function migrateBaseModelExtend(j, source) {
   return j(source)
     .find(j.MemberExpression, {
-      object: { name: 'IntercomModel' },
+      object: { name: 'BaseModel' },
       property: { name: 'extend' },
     })
     .forEach(path => {
@@ -93,79 +91,12 @@ function stripId(j, source) {
     .toSource(FORMATTING);
 }
 
-function migrateGetEmberDataStore(j, source) {
-  let isUsingGetEmberDataStoreInReopenClass = false;
-  let code = j(source)
-    .find(j.VariableDeclarator, {
-      id: {
-        name: 'store',
-      },
-      init: {
-        callee: {
-          name: 'getEmberDataStore',
-        },
-      },
-    })
-    .forEach(path => {
-      if (isWithinReopenClass(path)) {
-        isUsingGetEmberDataStoreInReopenClass = true;
-        return;
-      }
-      if (closestAncestorOfType(path, /VariableDeclaration/)) {
-        path.prune();
-      }
-    })
-    .toSource(FORMATTING);
-
-  code = j(code)
-    .find(j.CallExpression, {
-      callee: {
-        type: 'MemberExpression',
-        object: {
-          name: 'store',
-        },
-      },
-    })
-    .forEach(path => {
-      if (isWithinReopenClass(path)) {
-        return;
-      }
-      j(path).replaceWith(
-        j.callExpression(
-          j.memberExpression(
-            j.memberExpression(j.thisExpression(), j.identifier('store')),
-            path.value.callee.property,
-          ),
-          path.value.arguments,
-        ),
-      );
-    })
-    .toSource(FORMATTING);
-
-  if (isUsingGetEmberDataStoreInReopenClass) {
-    code = removeImportSpecifier(j, code, 'getEmberDataStore', 'embercom/helpers/container-lookup');
-  }
-
-  return code;
-}
-
-function isWithinReopenClass(path) {
-  let ancestorCallExpressions = getAncestorsOfType(path, /CallExpression/);
-  let callExpression = ancestorCallExpressions.find(path => {
-    if (!path.value || !path.value.callee || !path.value.callee.property) {
-      return false;
-    }
-    return /extend|reopenClass/.test(path.value.callee.property.name);
-  });
-  return callExpression.value.callee.property.name === 'reopenClass';
-}
-
 module.exports = function transformer(file, api) {
   const j = getParser(api);
 
   let source = file.source;
-  source = migrateIntercomModelImport(j, file.source);
-  source = migrateIntercomModelExtend(j, source);
+  source = migrateBaseModelImport(j, file.source);
+  source = migrateBaseModelExtend(j, source);
   source = removeEmberModelImport(j, source);
   source = removeEmberModelESLintComment(j, source);
   source = stripId(j, source);
@@ -173,7 +104,6 @@ module.exports = function transformer(file, api) {
   source = hasManyTransform(j, source);
   source = belongsToTransform(j, source);
   source = removeJsonTypeImport(j, source);
-  source = migrateGetEmberDataStore(j, source);
   source = annotateEmberModelConfiguration(j, source);
   return source;
 };

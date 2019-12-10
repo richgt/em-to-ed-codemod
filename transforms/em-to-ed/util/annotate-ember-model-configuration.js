@@ -27,7 +27,7 @@ const EMBER_MODEL_CONFIGURATION_KEYS = [
 function isUsingSimpleAdapter(prop) {
   return (
     prop.key.name === 'adapter' &&
-    prop.value.callee.object.name === 'RestAdapter' &&
+    prop.value.callee.object.name === 'RESTAdapter' &&
     prop.value.arguments.length === 0
   );
 }
@@ -36,7 +36,7 @@ function removeRestAdapterImport(j, source) {
   return j(source)
     .find(j.ImportDeclaration, {
       source: {
-        value: 'embercom/models/adapters/rest-adapter',
+        value: 'dashboard/adapters/rest_adapter',
       },
     })
     .forEach(path => {
